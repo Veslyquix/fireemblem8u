@@ -34,9 +34,9 @@ MID2AGB    := tools/mid2agb/mid2agb$(EXE)
 TEXTENCODE := tools/textencode/textencode$(EXE)
 JSONPROC   := tools/jsonproc/jsonproc$(EXE)
 PREPROC    := tools/preproc/preproc$(EXE)
-FETSATOOL  := scripts/gfxtools/tsa_generator.py
-TMAP2TSA   := scripts/tmap2tsa.py
-MARTOMAP   := scripts/mar_to_map.py
+FETSATOOL  := $(PYTHON) scripts/gfxtools/tsa_generator.py
+TMAP2TSA   := $(PYTHON) scripts/tmap2tsa.py
+MARTOMAP   := $(PYTHON) scripts/mar_to_map.py
 PYTHON    ?= python3
 PAL2GBAPAL := $(GBAGFX)
 
@@ -335,7 +335,7 @@ $(OBJECTS_LST): $(ALL_OBJECTS)
 	@echo $(ALL_OBJECTS) > $@
 
 $(ELF): $(ALL_OBJECTS) $(OBJECTS_LST) $(LDSCRIPT) $(SYM_FILES)
-	$(LD) -T $(LDSCRIPT) -Map $(MAP) @$(OBJECTS_LST) -R $(BANIM_OBJECT).sym.o -L tools/agbcc/lib -o $@ -lc -lgcc
+	$(LD) -T $(LDSCRIPT) -Map $(MAP) @$(OBJECTS_LST) -L tools/agbcc/lib -o $@ -lc -lgcc
 	$(STRIP) -N .gcc2_compiled. $@
 
 %.gba: %.elf
@@ -351,6 +351,9 @@ else
 	$(SED) '/.section	.debug_line/i\.align 2, 0' $*.s
 endif
 	$(AS) $(ASFLAGS) $*.s -o $@
+
+src/chapterdata.o: $(DATA_SRC_SUBDIR)/chapter_settings.h
+src/fontgrp.o: graphics/debug_font.4bpp.h
 
 ifeq ($(NODEP),1)
 asm/%.o:      data_dep :=
